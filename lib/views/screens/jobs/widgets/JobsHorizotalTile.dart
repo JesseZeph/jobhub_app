@@ -25,7 +25,7 @@ class JobHorizontalTile extends StatelessWidget {
               Radius.circular(12.w),
             ),
             child: Container(
-              height: hieght * 0.27,
+              height: hieght * 0.26,
               width: width * 0.7,
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.w),
               decoration: BoxDecoration(

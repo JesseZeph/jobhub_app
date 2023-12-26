@@ -9,7 +9,6 @@ import 'package:jobhubv2_0/controllers/jobs_provider.dart';
 import 'package:jobhubv2_0/controllers/login_provider.dart';
 import 'package:jobhubv2_0/controllers/zoom_provider.dart';
 import 'package:jobhubv2_0/models/request/applied/applied.dart';
-import 'package:jobhubv2_0/models/request/bookmarks/bookmarks_model.dart';
 import 'package:jobhubv2_0/models/response/bookmarks/book_res.dart';
 import 'package:jobhubv2_0/models/response/jobs/get_job.dart';
 import 'package:jobhubv2_0/services/firebase_services.dart';
@@ -69,15 +68,16 @@ class _JobDetailsState extends State<JobDetails> {
       'users': users,
       'chatRoomId': chatRoomId,
       'read': false,
+      'job': jobDetails,
       'profile': profile,
       'sender': userUid,
       'name': username,
       'agentName': widget.agentName,
       'messageType': messageType,
-      'lastChat': "Good day, Sir! I'm interested in this job.",
+      'lastChat': "Good Day, Sir! I'm interested in this job.",
       'lastChatTime': Timestamp.now()
     };
-    services.createChatRoom(chatData: chatData);
+    services.createChatRoom(chatData);
   }
 
   @override
@@ -259,14 +259,16 @@ class _JobDetailsState extends State<JobDetails> {
                                           'job_id': job.id,
                                           'image_url': job.imageUrl,
                                           'salary':
-                                              '${job.salary} per ${job.period}',
+                                              "${job.salary} per ${job.period}",
                                           'title': job.title,
-                                          'company': job.company,
+                                          'company': job.company
                                         };
+
                                         List<String> users = [
                                           job.agentId,
                                           userUid,
                                         ];
+
                                         String chatRoomId =
                                             '${job.id}.$userUid';
                                         String messageType = 'text';
@@ -280,9 +282,11 @@ class _JobDetailsState extends State<JobDetails> {
 
                                           AppliedPost model =
                                               AppliedPost(job: job.id);
+
                                           var newModel =
                                               appliedPostToJson(model);
-                                          AppliedHelper.applyJobs(newModel);
+
+                                          AppliedHelper.applyJob(newModel);
 
                                           zoomNotifier.currentIndex = 1;
                                           Get.to(() => const Mainscreen());

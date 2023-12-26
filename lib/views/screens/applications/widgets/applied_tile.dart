@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:jobhubv2_0/constants/app_constants.dart';
 import 'package:jobhubv2_0/models/response/applied/applied.dart';
 import 'package:jobhubv2_0/views/common/app_style.dart';
@@ -68,11 +67,12 @@ class AppliedTile extends StatelessWidget {
                                     FontWeight.w500)),
                           ],
                         ),
+
                         CustomOutlineBtn(
-                            width: 90.w,
-                            hieght: 36.h,
-                            text: "View",
-                            color: Color(kLightBlue.value))
+                          width: 90.w,
+                          hieght: 36.h,
+                          text: "View",
+                          color: Color(kLightBlue.value))
                       ],
                     ),
                   ],

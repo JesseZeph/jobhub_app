@@ -9,7 +9,6 @@ import 'package:jobhubv2_0/controllers/login_provider.dart';
 import 'package:jobhubv2_0/models/request/agents/agents.dart';
 import 'package:jobhubv2_0/services/firebase_services.dart';
 import 'package:jobhubv2_0/utils/date.dart';
-import 'package:jobhubv2_0/views/common/app_bar.dart';
 import 'package:jobhubv2_0/views/common/app_style.dart';
 import 'package:jobhubv2_0/views/common/drawer/drawer_widget.dart';
 import 'package:jobhubv2_0/views/common/height_spacer.dart';
@@ -40,13 +39,15 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
 
   final Stream<QuerySnapshot> _chat = FirebaseFirestore.instance
       .collection('chats')
-      .where('user', arrayContains: userUid)
+      .where('users', arrayContains: userUid)
       .snapshots();
 
   @override
   Widget build(BuildContext context) {
     var loginNotifier = Provider.of<LoginNotifier>(context);
-
+    if (loginNotifier.loggedIn == true) {
+      services.userStatus();
+    }
     return Scaffold(
       backgroundColor: const Color(0xFF171717),
       appBar: AppBar(
@@ -60,11 +61,11 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
             ? const SizedBox.shrink()
             : TabBar(
                 controller: tabController,
+                dividerHeight: 0,
                 indicator: BoxDecoration(
                     color: const Color(0x00BABABA),
                     borderRadius: BorderRadius.all(Radius.circular(25.w))),
                 labelColor: Color(kLight.value),
-                dividerHeight: 0,
                 unselectedLabelColor: Colors.grey.withOpacity(.5),
                 padding: EdgeInsets.all(3.w),
                 labelStyle: appStyle(12, Color(kLight.value), FontWeight.w500),
@@ -86,11 +87,12 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
               Stack(
                 children: [
                   Positioned(
-                      top: 20,
+                      top: 5,
                       right: 0,
                       left: 0,
                       child: Container(
-                        padding: EdgeInsets.only(left: 25.w, right: 0.w),
+                        padding:
+                            EdgeInsets.only(top: 15.w, left: 25.w, right: 0.w),
                         height: 220.h,
                         decoration: BoxDecoration(
                           color: Color(kNewBlue.value),
@@ -171,43 +173,47 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
                         ),
                       )),
                   Positioned(
-                    top: 150.h,
-                    right: 0,
-                    left: 0,
-                    child: Container(
-                        width: width,
-                        height: hieght,
-                        decoration: BoxDecoration(
-                          color: Color(kGreen.value),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20.w),
-                            topRight: Radius.circular(20.w),
+                      top: 150.h,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                          width: width,
+                          height: hieght,
+                          decoration: BoxDecoration(
+                            color: Color(kGreen.value),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20.w),
+                              topRight: Radius.circular(20.w),
+                            ),
                           ),
-                        ),
-                        child: StreamBuilder(
+                          child: StreamBuilder<QuerySnapshot>(
                             stream: _chat,
+                            // initialData: initialData,
                             builder: (BuildContext context, snapshot) {
                               if (snapshot.hasError) {
-                                return Text('Error ${snapshot.error}');
+                                return Text("Error $snapshot.error");
                               } else if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
                                 return const PageLoader();
                               } else if (snapshot.data!.docs.isEmpty) {
                                 return const NoSearchResults(
                                     text: 'No chats available');
-                              } else {
-                                final chatList = snapshot.data!.docs;
+                              }
 
-                                return ListView.builder(
+                              final chatList = snapshot.data!.docs;
+
+                              return ListView.builder(
                                   itemCount: chatList.length,
                                   shrinkWrap: true,
-                                  padding: const EdgeInsets.only(left: 25),
-                                  itemBuilder: ((context, index) {
-                                    final chat = chatList[index].data
+                                  padding:
+                                      EdgeInsets.only(left: 10.w, top: 10.w),
+                                  itemBuilder: (context, index) {
+                                    final chat = chatList[index].data()
                                         as Map<String, dynamic>;
                                     Timestamp lastChatTime =
                                         chat['lastChatTime'];
-                                    DateTime lastChatTimeDate =
+
+                                    DateTime lastChatDateTime =
                                         lastChatTime.toDate();
                                     return Consumer<AgentNotifier>(
                                       builder: (context, agentNotifier, child) {
@@ -215,28 +221,25 @@ class _ChatListState extends State<ChatList> with TickerProviderStateMixin {
                                           onTap: () {
                                             if (chat['sender'] != userUid) {
                                               services.updateCount(
-                                                  chat['charRoomId']);
+                                                  chat['chatRoomId']);
                                             } else {}
                                             agentNotifier.chat = chat;
                                             Get.to(() => const ChatPage());
                                           },
                                           child: buildChatRow(
-                                            chat['name']
-                                                ? chat['agentName']
-                                                : chat['name'],
-                                            chat['message'],
-                                            chat['profile'],
-                                            chat['read'] == false ? 0 : 1,
-                                            lastChatTimeDate,
-                                          ),
+                                              username == chat['name']
+                                                  ? chat['agentName']
+                                                  : chat['name'],
+                                              chat['lastChat'],
+                                              chat['profile'],
+                                              chat['read'] == false ? 1 : 0,
+                                              lastChatDateTime),
                                         );
                                       },
                                     );
-                                  }),
-                                );
-                              }
-                            })),
-                  )
+                                  });
+                            },
+                          )))
                 ],
               ),
               Container(
@@ -294,11 +297,10 @@ Column buildChatRow(
                         style: appStyle(12, Colors.grey, FontWeight.w400)),
                     const HeightSpacer(size: 5),
                     SizedBox(
-                      width: width * 0.65,
+                      width: width * 0.63,
                       child: ReusableText(
-                        text: message,
-                        style: appStyle(12, Colors.grey, FontWeight.w400),
-                      ),
+                          text: message,
+                          style: appStyle(12, Colors.grey, FontWeight.w400)),
                     ),
                   ],
                 ),
@@ -315,7 +317,7 @@ Column buildChatRow(
                   if (msgCount > 0)
                     CircleAvatar(
                       radius: 7,
-                      backgroundColor: Color(kLightBlue.value),
+                      backgroundColor: Color(kNewBlue.value),
                       child: ReusableText(
                           text: msgCount.toString(),
                           style: appStyle(
@@ -326,6 +328,10 @@ Column buildChatRow(
             )
           ],
         ),
+      ),
+      const Divider(
+        indent: 70,
+        height: 20,
       )
     ],
   );

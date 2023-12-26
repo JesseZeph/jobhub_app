@@ -4,12 +4,9 @@ import 'package:jobhubv2_0/constants/app_constants.dart';
 import 'package:jobhubv2_0/controllers/login_provider.dart';
 import 'package:jobhubv2_0/models/response/applied/applied.dart';
 import 'package:jobhubv2_0/services/helpers/applied_helper.dart';
-
 import 'package:jobhubv2_0/views/common/app_bar.dart';
-import 'package:jobhubv2_0/views/common/app_style.dart';
 import 'package:jobhubv2_0/views/common/drawer/drawer_widget.dart';
 import 'package:jobhubv2_0/views/common/pages_loader.dart';
-import 'package:jobhubv2_0/views/common/reusable_text.dart';
 import 'package:jobhubv2_0/views/common/styled_container.dart';
 import 'package:jobhubv2_0/views/screens/applications/widgets/applied_tile.dart';
 import 'package:jobhubv2_0/views/screens/auth/non_user.dart';
@@ -26,8 +23,8 @@ class AppliedJobs extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50.h),
         child: CustomAppBar(
-          text: 'Applied Jobs',
-          color: Color(kLightBlue.value),
+          text: 'Applies Jobs',
+          color: Color(kNewBlue.value),
           child: Padding(
             padding: EdgeInsets.all(12.0.h),
             child: DrawerWidget(color: Color(kLight.value)),
@@ -36,8 +33,7 @@ class AppliedJobs extends StatelessWidget {
       ),
       body: loginNotifier.loggedIn == false
           ? const NonUser()
-          : Center(
-              child: Stack(
+          : Stack(
               children: [
                 Positioned(
                     top: 0,
@@ -79,7 +75,7 @@ class AppliedJobs extends StatelessWidget {
                           )),
                     ))
               ],
-            )),
+            ),
     );
   }
 }

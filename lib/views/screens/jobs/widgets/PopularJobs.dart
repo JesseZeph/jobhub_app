@@ -16,7 +16,7 @@ class PopularJobs extends StatelessWidget {
       builder: (context, jobsNotifier, child) {
         jobsNotifier.getJobs();
         return SizedBox(
-          height: hieght * 0.23,
+          height: hieght * 0.24,
           child: FutureBuilder<List<JobsResponse>>(
               future: jobsNotifier.jobList,
               builder: (context, snapshot) {

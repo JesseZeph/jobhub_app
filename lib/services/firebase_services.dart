@@ -1,23 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jobhubv2_0/constants/app_constants.dart';
+import 'package:jobhubv2_0/controllers/login_provider.dart';
+import 'package:jobhubv2_0/controllers/zoom_provider.dart';
 
 class FirebaseServices {
   CollectionReference typing = FirebaseFirestore.instance.collection('typing');
   CollectionReference chats = FirebaseFirestore.instance.collection('chats');
   CollectionReference status = FirebaseFirestore.instance.collection('status');
-  CollectionReference message =
-      FirebaseFirestore.instance.collection('message');
+  CollectionReference messages =
+      FirebaseFirestore.instance.collection('messages');
 
-  createChatRoom({chatData}) {
-    chats.doc(chatData['charRoomId']).set(chatData).catchError((e) {
+  createChatRoom(Map<String, dynamic> chatData) {
+    chats.doc(chatData['chatRoomId']).set(chatData).catchError((e) {
       debugPrint(e.toString());
     });
   }
 
   void addTypingStatus(String chatRoomId) {
     typing.doc(chatRoomId).collection('typing').doc(userUid).set({});
+  }
+
+  void userStatus() {
+    status.doc('status').collection(userUid).doc(userUid).set({});
+  }
+
+  void removeStatus(ZoomNotifier zoomNotifier, LoginNotifier loginNotifier) {
+    if (zoomNotifier.currentIndex != 1 && loginNotifier.loggedIn == true) {
+      status.doc('status').collection(userUid).doc(userUid).delete();
+    }
+    
   }
 
   void removeTypingStatus(String chatRoomId) {
@@ -33,10 +45,11 @@ class FirebaseServices {
       'messageType': message['messageType'],
       'sender': message['sender'],
       'profile': message['profile'],
+      'id': message['id'],
       'timestamp': Timestamp.now(),
       'lastChat': message['message'],
-      'lastTimeChat': message['time'],
-      'read': false,
+      'lastChatTime': message['time'],
+      'read': false
     });
   }
 
@@ -44,10 +57,11 @@ class FirebaseServices {
     chats.doc(chatRoomId).update({'read': true});
   }
 
-  Future<bool> chatRoomExist(chatRoomId) async {
+  Future<bool> chatRoomExist(String chatRoomId) async {
     DocumentReference chatRoomRef = chats.doc(chatRoomId);
-    DocumentSnapshot chatRoomSnapShot = await chatRoomRef.get();
 
-    return chatRoomSnapShot.exists;
+    DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
+
+    return chatRoomSnapshot.exists;
   }
 }

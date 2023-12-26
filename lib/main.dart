@@ -24,8 +24,8 @@ Widget defaultHome = const OnboardingScreen();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   final entrypoint = prefs.getBool('entrypoint') ?? false;

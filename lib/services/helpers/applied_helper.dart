@@ -1,15 +1,12 @@
-import 'dart:convert';
 import 'package:http/http.dart' as https;
-import 'package:jobhubv2_0/models/request/agents/agents.dart';
 import 'package:jobhubv2_0/models/response/applied/applied.dart';
-
 import 'package:jobhubv2_0/services/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppliedHelper {
   static var client = https.Client();
 
-  static Future<bool> applyJobs(String model) async {
+  static Future<bool> applyJob(String model) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -36,7 +33,7 @@ class AppliedHelper {
     String? token = prefs.getString('token');
 
     if (token == null) {
-      throw Exception('Token is required');
+       throw Exception('Failed to get token');
     }
 
     Map<String, String> requestHeaders = {
@@ -47,10 +44,10 @@ class AppliedHelper {
     var response = await client.get(url, headers: requestHeaders);
 
     if (response.statusCode == 200) {
-      var applied = appliedFromJson(response.body);
+        var applied = appliedFromJson(response.body);
       return applied;
     } else {
-      throw Exception('Failed to get applied jobs');
+       throw Exception('Failed to get applied jobs');
     }
   }
 }

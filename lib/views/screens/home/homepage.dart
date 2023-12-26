@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:jobhubv2_0/constants/app_constants.dart';
 import 'package:jobhubv2_0/controllers/login_provider.dart';
+import 'package:jobhubv2_0/controllers/zoom_provider.dart';
+import 'package:jobhubv2_0/services/firebase_services.dart';
 import 'package:jobhubv2_0/views/common/app_bar.dart';
 import 'package:jobhubv2_0/views/common/app_style.dart';
 import 'package:jobhubv2_0/views/common/drawer/drawer_widget.dart';
@@ -25,11 +27,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FirebaseServices services = FirebaseServices();
   String imageUrl =
       "https://d326fntlu7tb1e.cloudfront.net/uploads/b5065bb8-4c6b-4eac-a0ce-86ab0f597b1e-vinci_04.jpg";
   @override
   Widget build(BuildContext context) {
     var loginNotifier = Provider.of<LoginNotifier>(context);
+    var zoomNotifier = Provider.of<ZoomNotifier>(context);
+    services.removeStatus(zoomNotifier, loginNotifier);
     loginNotifier.getPref();
     return Scaffold(
       appBar: PreferredSize(
@@ -40,9 +45,9 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.all(12.0.h),
                   child: GestureDetector(
                     onTap: () {
-                      loginNotifier.loggedIn == true ?
-                      Get.to(() => const ProfilePage(drawer: false))
-                      : Get.to(() => const LoginPage());
+                      loginNotifier.loggedIn == true
+                          ? Get.to(() => const ProfilePage(drawer: false))
+                          : Get.to(() => const LoginPage());
                     },
                     child: ClipRRect(
                       borderRadius: const BorderRadius.all(Radius.circular(50)),
